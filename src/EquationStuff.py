@@ -452,3 +452,4 @@ if __name__ == "__main__" :
     print(compareEqual("3 Vx = 3","Vx = 1"))
     print(compareEqual("3Vx = 3","1 = Vx"))
     print(compareEqual("3Vx = 3","1 + Vx"))
+    print(compareEqual("3y * i + ( 3x - 6y ) * j","3y * (i + j) + ( x - y ) * 3j"))

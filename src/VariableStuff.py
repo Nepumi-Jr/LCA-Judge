@@ -6,7 +6,7 @@ class ComplexNumber:
     real = 0
     imagine = 0
 
-    def __init__(self, real = 0, imagine = 0) -> None:
+    def __init__(self, real = 0, imagine = 0):
         self.real = real
         self.imagine = imagine
     
@@ -251,5 +251,7 @@ if __name__ == '__main__':
     print(compareVar(12.3, "3 + 1j",0.05))
     print(compareVar(7, complex(7,0),0.05))
     print(compareVar(7, complex(7),0.05))
+
+    print(ComplexNumber.fromStr("1 * 2"))
     
 

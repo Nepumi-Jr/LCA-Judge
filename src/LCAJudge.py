@@ -23,6 +23,7 @@ from subprocess import Popen,TimeoutExpired,PIPE
 import time
 import signal
 import EquationStuff
+import VariableStuff
 
 judgeArgs = sys.argv[-1]
 
@@ -89,57 +90,63 @@ def readSolution():
 
     global ANS,MAX_TEST
 
-    if not path.exists(path.join(PROBLEM_DIR,"Solution.txt")):
+    if not path.exists(path.join(PROBLEM_DIR,"Answer.txt")):
         if testCase == "1":
-            print(f"!;0;1;0;0;Solution.txt not found",end = "")
+            print(f"!;0;1;0;0;Answer.txt not found",end = "")
             exit(0)
         else:
             print(f"E;0;0;0;0;End of Test",end = "")
             exit(0)
-    with open(path.join(PROBLEM_DIR,"Solution.txt"),"r") as f:
+    with open(path.join(PROBLEM_DIR,"Answer.txt"),"r") as f:
         content =  f.read().strip().replace("\r","").split("\n")
     
+    
+
     for line in content:
         data = str2CppCmp(line.strip())
-        if len(data) == 4 and data[1] == '=':
-            if len(data[3]) > 2:
+
+        if data[1] == '=':
+
+            if len(data[-1]) > 2:
                 continue
 
-            try:
-                solAnswer = float(data[2])
-            except:
+            solAnswer = VariableStuff.ComplexNumber.fromStr(' '.join(data[2:-1]))
+            
+            
+
+            if type(solAnswer) == type("hello"):
                 continue
 
-            if len(data[3]) == 2:
-                if not (data[3][0] in "EPTGMkmunpfa"):
+            if len(data[-1]) == 2:
+                if not (data[-1][0] in "EPTGMkmunpfa"):
                     continue
                 
-                if data[3][0] == 'E':
+                if data[-1][0] == 'E':
                     solAnswer *= 1e18
-                elif data[3][0] == 'P':
+                elif data[-1][0] == 'P':
                     solAnswer *= 1e15
-                elif data[3][0] == 'T':
+                elif data[-1][0] == 'T':
                     solAnswer *= 1e12
-                elif data[3][0] == 'G':
+                elif data[-1][0] == 'G':
                     solAnswer *= 1e9
-                elif data[3][0] == 'M':
+                elif data[-1][0] == 'M':
                     solAnswer *= 1e6
-                elif data[3][0] == 'k':
+                elif data[-1][0] == 'k':
                     solAnswer *= 1e3
-                elif data[3][0] == 'm':
+                elif data[-1][0] == 'm':
                     solAnswer *= 1e-3
-                elif data[3][0] == 'u':
+                elif data[-1][0] == 'u':
                     solAnswer *= 1e-6
-                elif data[3][0] == 'n':
+                elif data[-1][0] == 'n':
                     solAnswer *= 1e-9
-                elif data[3][0] == 'p':
+                elif data[-1][0] == 'p':
                     solAnswer *= 1e-12
-                elif data[3][0] == 'f':
+                elif data[-1][0] == 'f':
                     solAnswer *= 1e-15
-                elif data[3][0] == 'a':
+                elif data[-1][0] == 'a':
                     solAnswer *= 1e-18
         
-            ANS.append((data[0],solAnswer,data[3][-1]))
+            ANS.append((data[0],solAnswer,data[-1][-1]))
         else:
             if data[1] == ':' and type(EquationStuff.convertAndCheck(" ".join(data[2:]))) != type(str()) :
                 ANS.append((data[0]," ".join(data[2:])))
@@ -147,59 +154,53 @@ def readSolution():
     
     MAX_TEST = len(ANS)
 
-
-
-def deltaCal(a:float,b:float) -> float():
-    if max(abs(a),abs(b)) == 0:
-        return abs(a-b) * 100
-    return abs(abs(a-b)/max(abs(a),abs(b)))*100
-
 def variableCompare(data):
     tc = int(testCase) - 1    
-    if len(data[3]) > 2:
+    if len(data[-1]) > 2:
         return "X",0,1,f"{data[0]} : Wrong Unit Format in {data[0]}"
 
-    if data[3][-1] != ANS[tc][2]:
+    if data[-1][-1] != ANS[tc][2]:
         return "-",0,1,f"{data[0]} : Wrong Unit (Expect {ANS[tc][2]} but got {data[3][-1]})"
 
-    try:
-        userAnswer = float(data[2])
-    except:
-        return "X",0,1,f"{data[0]} : Can't convert {data[2]} to number :("
-
-    if len(data[3]) == 2:
-        if not (data[3][0] in "EPTGMkmunpfa"):
-            return "-",0,1,f"{data[0]} : Wat format? {data[3]}!?"
+    userAnswer = VariableStuff.ComplexNumber.fromStr(' '.join(data[2:-1]))
         
-        if data[3][0] == 'E':
+    if type(userAnswer) == type("hello"):
+        return "X",0,1,"refAns Error :in variable {} Can't convert {} to (Complex) number ({})".format(data[0],' '.join(data[2:-1]), userAnswer)
+
+    if len(data[-1]) == 2:
+        if not (data[-1][0] in "EPTGMkmunpfa"):
+            return "-",0,1,f"{data[0]} : Wat format? {data[-1]}!?"
+        
+        if data[-1][0] == 'E':
             userAnswer *= 1e18
-        elif data[3][0] == 'P':
+        elif data[-1][0] == 'P':
             userAnswer *= 1e15
-        elif data[3][0] == 'T':
+        elif data[-1][0] == 'T':
             userAnswer *= 1e12
-        elif data[3][0] == 'G':
+        elif data[-1][0] == 'G':
             userAnswer *= 1e9
-        elif data[3][0] == 'M':
+        elif data[-1][0] == 'M':
             userAnswer *= 1e6
-        elif data[3][0] == 'k':
+        elif data[-1][0] == 'k':
             userAnswer *= 1e3
-        elif data[3][0] == 'm':
+        elif data[-1][0] == 'm':
             userAnswer *= 1e-3
-        elif data[3][0] == 'u':
+        elif data[-1][0] == 'u':
             userAnswer *= 1e-6
-        elif data[3][0] == 'n':
+        elif data[-1][0] == 'n':
             userAnswer *= 1e-9
-        elif data[3][0] == 'p':
+        elif data[-1][0] == 'p':
             userAnswer *= 1e-12
-        elif data[3][0] == 'f':
+        elif data[-1][0] == 'f':
             userAnswer *= 1e-15
-        elif data[3][0] == 'a':
+        elif data[-1][0] == 'a':
             userAnswer *= 1e-18
-    
-    if deltaCal(ANS[tc][1],userAnswer) <= 5:
+
+
+    if VariableStuff.compareVar(userAnswer , ANS[tc][1], 0.05):
         return "P",1,1,"Wow za!"
     else:
-        return "-",0,1,f"{data[0]} : Wrong Answer (Delta is more than 5%)"
+        return "-",0,1,f"{data[0]} : Wrong Answer"
 
 def equationCompare(data):
     userRes = EquationStuff.convertAndCheck(" ".join(data[2:]))
@@ -228,13 +229,15 @@ def compare():
         
         tc = int(testCase) - 1 
         if data[0] == ANS[tc][0]:
-            if len(data) == 4 and data[1] == '=':
+            if ANS[tc][1] == ':' and data[1] == '=':
+                return "X",0,1,f"{ANS[tc][0]} : Expected Equation got Number"
+            if ANS[tc][1] == '=' and data[1] == ':':
+                return "X",0,1,f"{ANS[tc][0]} : Expected Number got Equation"
+
+            if data[1] == '=':
                 return variableCompare(data)
             elif data[1] == ":":
                 return equationCompare(data)
-
-            
-
 
     return "X",0,1,f"{ANS[tc][0]} not found or Wrong format... :("
 
