@@ -90,14 +90,14 @@ def readSolution():
 
     global ANS,MAX_TEST
 
-    if not path.exists(path.join(PROBLEM_DIR,"Answer.txt")):
+    if not path.exists(path.join(PROBLEM_DIR,"answer.txt")):
         if testCase == "1":
-            print(f"!;0;1;0;0;Answer.txt not found",end = "")
+            print(f"!;0;1;0;0;answer.txt not found",end = "")
             exit(0)
         else:
             print(f"E;0;0;0;0;End of Test",end = "")
             exit(0)
-    with open(path.join(PROBLEM_DIR,"Answer.txt"),"r") as f:
+    with open(path.join(PROBLEM_DIR,"answer.txt"),"r") as f:
         content =  f.read().strip().replace("\r","").split("\n")
     
     
