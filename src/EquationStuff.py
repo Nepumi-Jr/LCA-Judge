@@ -306,6 +306,10 @@ def convertAndCheck(equ:str):
     equations = []
     if len(content) > 2:
         return "too much '='"
+    
+    if len(content) == 1:
+        return "No '=' in equation."
+
     for equa in content:
         con = str2CppCmp(equa.strip())
         paren = 0
