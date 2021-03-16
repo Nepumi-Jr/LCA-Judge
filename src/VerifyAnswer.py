@@ -7,7 +7,13 @@ if len(sys.argv) < 2:
     print("no input file :(",file=sys.stderr)
     exit(1)
 
-fileVeri = sys.argv[-1]
+answerReporter = False
+
+if len(sys.argv) == 2:
+    fileVeri = sys.argv[-1]
+elif len(sys.argv) == 3:
+    fileVeri = sys.argv[1]
+    answerReporter = True
 
 if not path.exists(fileVeri):
     print("input file not found",file=sys.stderr)
@@ -31,7 +37,7 @@ ANS = []
 
 for line in content:
     data = str2CppCmp(line.strip())
-    if data[1] == '=':
+    if len(data) >= 4 and data[1] == '=':
         if len(data[-1]) > 2:
             print(f"Warning {data[0]} : Wrong Unit ({data[-1]})",file=sys.stderr)
             continue
@@ -73,7 +79,7 @@ for line in content:
                 solAnswer *= 1e-18
         #add to ANS
         ANS.append((data[0],solAnswer,data[-1][-1]))
-    elif data[1] == ':':
+    elif len(data) >= 3 and data[1] == ':':
 
         ansRef = EquationStuff.convertAndCheck(" ".join(data[2:]))
 
@@ -82,6 +88,8 @@ for line in content:
             continue
         else:
             ANS.append((data[0],ansRef))
+    else:
+        print(f"Warning {data[0]} : unreadable (no space or wrong format)",file=sys.stderr)
 
 
         
@@ -92,6 +100,16 @@ if len(ANS) == 0:
     print("\n--------------------------\nProblem Error : No correctly Answer\nAre you type the correct format?\n\nYou can read format in",file=sys.stderr)
     print(r"",file=sys.stderr)
     exit(1)
+
+if answerReporter:
+    print("===Here is answer that Accepted===")
+    for ans in ANS:
+        print(ans[0],"is",ans[1],end = " ")
+
+        if len(ans) > 2 :
+            print(ans[2])
+        else:
+            print()
 
 exit(0)
 
