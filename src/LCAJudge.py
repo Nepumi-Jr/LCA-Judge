@@ -116,13 +116,13 @@ def variableCompare(data):
     if VariableStuff.compareVar(data[2] , ANS[tc][2], 0.05) and data[3] == ANS[tc][3]:
         return "P",1,1,"Wow za!"
     else:
-        return "-",0,1,f"{data[0]} : Wrong Answer"
+        return "-",0,1,f"{data[1]} : Wrong Answer"
 
 def equationCompare(data):
     if EquationStuff.compareEqual(data[2],ANS[int(testCase) - 1][2]):
         return "P",1,1,"Complete"
     else:
-        return "-",0,1,f"{data[0]} : Wrong answer"
+        return "-",0,1,f"{data[1]} : Wrong answer"
             
 
 def compare():
