@@ -19,6 +19,28 @@ def str2CppCmp(x:str) -> list():
     
     return res
 
+def findLast(content:str,sym:str) -> int:
+    for i in range(len(content) - 1,-1,-1):
+        if content[i] == sym:
+            return i
+    return -1
+
+def compareVarAdv(l1:list,l2:list) -> bool:
+    l1s = set()
+    l2s = set()
+    for v1 in l1:
+        if v1[0].find("(") != -1:
+            l1s.add((v1[0][:v1[0].find("(")],v1[1]))
+        else:
+            l1s.add((v1[0],v1[1]))
+    
+    for v2 in l2:
+        if v2[0].find("(") != -1:
+            l2s.add((v2[0][:v2[0].find("(")],v2[1]))
+        else:
+            l2s.add((v2[0],v2[1]))
+    
+    return l1s == l2s
 
 class Pod(object):
     
@@ -35,7 +57,7 @@ class Pod(object):
 
     def findVarInd(self, vars, key):
         for i in range(len(vars)):
-            if vars[i][0] == key:
+            if compareVarAdv(vars[i][0],key):
                 return i
         return -1
     
@@ -198,18 +220,18 @@ class Pod(object):
 
     def __str__(self):
         strRes = ""
-        if self.num != 0.0:strRes += f"{self.num} "
+        if self.num != 0.0:strRes += "{} ".format(self.num)
         
         for var in self.vars:
 
             if var[1] == 1:
-                strRes += f"+ "
+                strRes += "+ "
             elif var[1] > 1:
-                strRes += f"+ {var[1]}"
+                strRes += "+ {}".format(var[1])
             elif var[1] == -1:
-                strRes += f"- "
+                strRes += "- "
             elif var[1] < -1:
-                strRes += f"- {abs(var[1])}"
+                strRes += "- {}".format(abs(var[1]))
             else:continue
 
 
@@ -217,11 +239,11 @@ class Pod(object):
                 if v[1] == 0:
                     continue
                 elif v[1] == 1:
-                    strRes += f"{v[0]}"
+                    strRes += "{}".format(v[0])
                 elif v[1] > 1:
-                    strRes += f"{v[0]}^{v[1]}"
+                    strRes += "{}^{}".format(v[0],v[1])
                 else:
-                    strRes += f"{v[0]}^({v[1]})"
+                    strRes += "{}^({})".format(v[0],v[1])
 
             strRes += ' '
 
@@ -245,6 +267,7 @@ def isSymbol(ss:str) -> bool:
     return (ss in "+-*/()")
 
 def isNum(ss:str) -> bool:
+    if ss == ".":return True
     try:
         float(ss)
         return True
@@ -298,10 +321,10 @@ def solveInfix(equ:list) -> Pod:
             n2 = stackNumber.pop()
             stackNumber.append(doOperator(n2,pos,n1))
 
-    return stackNumber[-1];
+    return stackNumber[-1]
 
 def convertAndCheck(equ:str):
-    content = equ.strip().split('=')
+    content = equ.strip().replace(" ","").split('=')
     
     equations = []
     if len(content) > 2:
@@ -311,88 +334,102 @@ def convertAndCheck(equ:str):
         return "No '=' in equation."
 
     for equa in content:
-        con = str2CppCmp(equa.strip())
-        paren = 0
-        for e in con:
-            if e == '(':
-                paren += 1
-            elif e == ')':
-                paren -= 1
-            if paren < 0:
-                return "Parentheses Error"
+        thisEqu = []
+        hold = ""
+        mode = "?" #N V or ?
+        tempP = 0
+        firstPar = False;
         
-        if paren != 0:
-            return "Parentheses Error"
-        
-        result = [con[0]]
-        pre = con[0]
 
-        for i in range(1,len(con)):
-            if pre not in "+-*/()" and con[i] not in "+-*/()":
-                result.append("*")
-            elif pre not in "+-*/()" and con[i] in "(":
-                result.append("*")
-            elif pre in ")" and con[i] not in "+-*/()":
-                result.append("*")
-            result.append(con[i])
-            pre = con[i]
-        equations.append(result)
-
-
-        lastEquations = []
-
-        for equ in equations:
-            thisEqu = []
-            for e in equ:
-                
-                
-                num = ""
-                var = ""
-                isNumBruh = True 
-
-                for c in e:
-                    if isNumBruh and (c.isnumeric() or c == '.' or c == '-'):
-                        num += c
-                    else:
-                        var += c
-                        isNumBruh = False
-                
-                if num.strip() == '' and var.strip() == '':
-                    continue
-
-                if num.strip() == '':
-                    thisEqu.append(var.strip())
-                    continue
-
-                if num == '-':
-                    thisEqu.append(e)
-                    continue
-
-                try:
-                    float(num)
-                except:
-                    return "NumError : {}".format(num)
-                    
-                if len(num) > 0 and len(var) > 0:
-                    thisEqu.append(num)
-                    thisEqu.append("*")
-                    thisEqu.append(var)
+        for sym in equa:
+            if mode == "N":
+                if isNum(hold + sym):
+                    hold += sym
+                elif sym in "+-*/()":
+                    thisEqu.append(hold)
+                    thisEqu.append(sym)
+                    hold = ""
+                    mode = "?"
                 else:
-                    thisEqu.append(e)
-            lastEquations.append(thisEqu)
+                    thisEqu.append(hold)
+                    hold = sym
+                    mode = "V"
+                    firstPar = True
+            elif mode == "V":
+                if sym in "+-*/":
+                    if tempP > 0:
+                        hold += sym
+                    else:
+                        thisEqu.append(hold)
+                        thisEqu.append(sym)
+                        hold = ""
+                        mode = "?"
+                elif sym == "(":
+                    if tempP == 0:
+                        if firstPar:
+                            tempP += 1
+                            hold += sym
+                            firstPar = False
+                        else:
+                            thisEqu.append(hold)
+                            thisEqu.append(sym)
+                            hold = ""
+                            mode = "?"
+                    else:
+                        tempP += 1
+                        hold += sym
+                elif sym == ")":
+                    if tempP == 0:
+                        thisEqu.append(hold)
+                        thisEqu.append(sym)
+                        hold = ""
+                        mode = "?"
+                    else:
+                        tempP -= 1
+                        hold += sym
+                    
+                else:
+                    hold += sym
+            else:
+                if isNum(sym):
+                    hold = sym
+                    mode = "N"
+                elif sym in "+-*/()":
+                    thisEqu.append(sym)
+                else:
+                    firstPar = True
+                    mode = "V"
+                    hold = sym
+        
+        if (mode == "N" or mode == "V") and hold != '':
+            thisEqu.append(hold)
+        
+        realThisEqu = []
+        realThisEqu.append(thisEqu[0])
 
-    
+        for i in range(1,len(thisEqu)):
+            stuff = thisEqu[i];
 
-    return lastEquations
+            if realThisEqu[-1] not in "+-*/()" and stuff not in "+-*/()":
+                realThisEqu.append("*")
+            elif realThisEqu[-1].endswith(")") and stuff.startswith("("):
+                realThisEqu.append("*")
+            realThisEqu.append(stuff)
+
+        equations.append(realThisEqu)
+
+
+
+    return equations
 
 def compareEqual(equ1:str, equ2:str):
     resultE1 = convertAndCheck(equ1)
     if type(resultE1) == type(str()):
-        return f"Equ 1 error : {resultE1}"
+        return "Equ 1 error : {}".format(resultE1)
     
     resultE2 = convertAndCheck(equ2)
     if type(resultE2) == type(str()):
-        return f"Equ 2 error : {resultE2}"
+        return "Equ 2 error : {}".format(resultE2)
 
 
     solution1 = solveInfix(resultE1[0])
@@ -407,7 +444,6 @@ def compareEqual(equ1:str, equ2:str):
 
     G_Fac = 1.0
     G_Done = False
-
     
     
     if solution1.num == 0 or solution2.num == 0:
@@ -416,6 +452,7 @@ def compareEqual(equ1:str, equ2:str):
     else:
         G_Fac = solution1.num / solution2.num
         G_Done = True
+    
     
     if len(solution1.vars) != len(solution2.vars):
         return False
@@ -427,19 +464,39 @@ def compareEqual(equ1:str, equ2:str):
                 G_Fac = var[1] / solution2.vars[res][1]
                 G_Done = True
             else:
-                if (G_Fac - var[1] / solution2.vars[res][1]) / G_Fac >= 0.01:
-                    return False
+                if abs(G_Fac - var[1] / solution2.vars[res][1]) / G_Fac >= 0.01:
+                    return False    
+            
+            #Compare function
+            for miniV in var[0]:
+                if miniV[0].find("(") != - 1:
+                    findV2 = -1
+                    for miniV2 in solution2.vars[res][0]:
+                        if miniV2[0].find("(") != - 1:
+                            if miniV2[0][:miniV2[0].find("(")] == miniV[0][:miniV[0].find("(")]:
+                                findV2 = miniV2[0]
+                    
+                    if findV2 == -1:
+                        return False
+                    findV1 = miniV[0]
+                    
+                    newE1 = findV1[findV1.find("(") + 1 : findLast(findV1,")")]+"=0"
+                    newE2 = findV2[findV2.find("(") + 1 : findLast(findV2,")")]+"=0"
+
+                    if compareEqual(newE1,newE2) == False:
+                        return False
+
+
+            
         else:
             return False
-     
+    
+    
     return True
 
 
 if __name__ == "__main__" :
     
-
-    print(compareEqual("4","4"))
-    print(compareEqual("4 + 2","6"))
     print(compareEqual("0 = 2 x + 3 y ","2 x + 3 y = 0"))
     print(compareEqual("-  2 x = + 3 y ","2 x + 3 y = 0"))
     print(compareEqual("- 2 x - 3 y = 0","2 x + 3 y = 0"))
@@ -447,7 +504,7 @@ if __name__ == "__main__" :
     print(compareEqual("2 x + 3 y = 0","2 x + 3 y = 0"))
 
     print("WA")
-    print(compareEqual("2 x + 3 y ","- 2 x + 3 y"))
+    print(compareEqual("2 x + 3 y = 0 ","- 2 x + 3 y = 0"))
 
     print("\nTest")
     print(compareEqual("Vy + Vx = - 2 * Vx + 5","Vx + Vy + 2 * Vx = 5"))
@@ -455,8 +512,14 @@ if __name__ == "__main__" :
     print(compareEqual("Vx * Vx + Vy = 2", "Vx * Vx = 2 - Vy"))
     print(compareEqual("3 Vx = 3","Vx = 1"))
     print(compareEqual("3Vx = 3","1 = Vx"))
-    print(compareEqual("3Vx = 3","1 + Vx"))
-    print(compareEqual("3y * i + ( 3x - 6y ) * j","3y * (i + j) + ( x - y ) * 3j"))
+    print(compareEqual("3Vx = 3","-1 + Vx = 0"))
+    print(compareEqual("3y * i + ( 3x - 6y ) * j = 0","3y * (i + j) + ( x - y ) * 3j = 0"))
 
     print(compareEqual("xy = 0","x * y = 0"))
     print(compareEqual("x y = 0","x * y = 0"))
+    print(compareEqual("y * x = 0","x * y = 0"))
+
+    print(compareEqual("V(t) = t * t - 1 t - 12","V(t) = ( t - 4 ) * ( t + 3 )"))
+
+
+    print(compareEqual("V(T) = 1/12/35exp(x+2)", "V(T) = 1/(12*35)exp(x+1+1)"))

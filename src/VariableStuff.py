@@ -252,6 +252,8 @@ if __name__ == '__main__':
     print(compareVar(7, complex(7,0),0.05))
     print(compareVar(7, complex(7),0.05))
 
-    print(ComplexNumber.fromStr("1 * 2"))
+    print(ComplexNumber.fromStr("3+1j"))
+    print(ComplexNumber.fromStr("2i-1"))
+    print(ComplexNumber.fromStr("."))
     
 
