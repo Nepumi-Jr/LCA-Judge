@@ -1,11 +1,7 @@
-DEBUG = False
-
-if DEBUG:
-    import EquationStuff
-    import VariableStuff
-else:
-    from mini_garedami import EquationStuff
-    from mini_garedami import VariableStuff
+#from LCA_Judge.src 
+from LCA_Judge.src import EquationStuff
+from LCA_Judge.src import VariableStuff
+from LCA_Judge.src import BigAnswerConvert
 
 ANS = dict()
 MAX_TEST = 0
@@ -33,71 +29,16 @@ def readSolution(refAns):
     for line in lines:
         content.extend(line.strip().split(";"))
 
-
-    
     for chunk in content:
-        #Convert chunk to mini-chunk data
-        #V1 = 2 A to ['V1','=','2','A']
-        data = str2CppCmp(chunk.strip())
+        #Convert chunk to data by BigAnswerConvert
+        data = BigAnswerConvert.bigConvert(chunk.strip())
 
-        #if data has '=' in second 
-        #That mean variable compare
-        if data[1] == '=':
-            if len(data[-1]) > 2:
-                print("refAns Error : Wrong unit in variable {}".format(data[0]))
-                continue
+        if type(data) == type("Error"):
+            print("refAns Error {}".format(data))
+            continue
             
-            solAnswer = VariableStuff.ComplexNumber.fromStr(' '.join(data[2:-1]))
+        ANS[data[1]] = data
             
-            if type(solAnswer) == "hello":
-                print("refAns Error :in variable {} Can't convert {} to (Complex) number ({})".format(data[0],' '.join(data[2:-1]), solAnswer))
-                continue
-
-            if len(data[-1]) == 2:
-                if not (data[-1][0] in "EPTGMkmunpfa"):
-                    print("refAns Error :in variable {} Wrong prefix".format(data[0],data[-1]))
-                    continue
-                
-                if data[-1][0] == 'E':
-                    solAnswer *= 1e18
-                elif data[-1][0] == 'P':
-                    solAnswer *= 1e15
-                elif data[-1][0] == 'T':
-                    solAnswer *= 1e12
-                elif data[-1][0] == 'G':
-                    solAnswer *= 1e9
-                elif data[-1][0] == 'M':
-                    solAnswer *= 1e6
-                elif data[-1][0] == 'k':
-                    solAnswer *= 1e3
-                elif data[-1][0] == 'm':
-                    solAnswer *= 1e-3
-                elif data[-1][0] == 'u':
-                    solAnswer *= 1e-6
-                elif data[-1][0] == 'n':
-                    solAnswer *= 1e-9
-                elif data[-1][0] == 'p':
-                    solAnswer *= 1e-12
-                elif data[-1][0] == 'f':
-                    solAnswer *= 1e-15
-                elif data[-1][0] == 'a':
-                    solAnswer *= 1e-18
-            #add to ANS
-            ANS[data[0]] = (solAnswer,data[-1][-1])
-
-        #if data ':' in second 
-        #That mean Equation Compare
-        elif data[1] == ':':
-            #if return in str that mean Equation Error
-            result = EquationStuff.convertAndCheck(" ".join(data[2:]))
-            if type(result) == type("hello"):
-                print("refAns Error : in Equation {} Err ({})".format(data[0],result))
-                continue
-            else:
-                ANS[data[0]] = " ".join(data[2:])
-            
-        
-    
     MAX_TEST = len(ANS)
 
 
@@ -139,93 +80,38 @@ def grading(student_out:str, ref_ans:str, fullscore, report, attrib, neg_handlin
         for chunk in studentContent:
             #Convert chunk to mini-chunk data
             #V1 = 2 A to ['V1','=','2','A']
-            data = str2CppCmp(chunk.strip())
+            data = BigAnswerConvert.bigConvert(chunk.strip())
 
-            if data[0] in ANS and data[0] not in judged:
-                if data[1] == '=':
-                    if type(ANS[data[0]]) == type(tuple()):
+            if data[1] in ANS and data[1] not in judged:
 
-                        if data[-1][-1] != ANS[data[0]][1]:
-                            reportFormatError("{} : Wrong Unit (Expect {} but got {}).".format(data[0], ANS[data[0]][1], data[-1][-1]))
-                            perfect = False
-                            judged.add(data[0])
-                            continue
+                if data[0] != ANS[data[1]][0]:
+                    reportFormatError("{} : Expected {} but got {}".format(data[1], ANS[data[1]][0]=='E' and 'Equation' or 'Number', data[0]=='E' and 'Equation' or 'Number'))
+                    perfect = False
+                    judged.add(data[0])
+                    continue
 
-                        userAnswer = VariableStuff.ComplexNumber.fromStr(' '.join(data[2:-1]))
-                
-                        if type(userAnswer) == "hello":
-                            reportFormatError("{} :  Can't convert {} to (Complex) number ({})".format(data[0],' '.join(data[2:-1]), userAnswer))
-                            perfect = False
-                            judged.add(data[0])
-                            continue
-
-                        if len(data[-1]) == 2:
-                            if not (data[-1][0] in "EPTGMkmunpfa"):
-                                reportFormatError("{} : Wronf prefix unit ({}).".format(data[0], data[-1]))
-                                perfect = False
-                                judged.add(data[0])
-                                continue
-                            if data[-1][0] == 'E':
-                                userAnswer *= 1e18
-                            elif data[-1][0] == 'P':
-                                userAnswer *= 1e15
-                            elif data[-1][0] == 'T':
-                                userAnswer *= 1e12
-                            elif data[-1][0] == 'G':
-                                userAnswer *= 1e9
-                            elif data[-1][0] == 'M':
-                                userAnswer *= 1e6
-                            elif data[-1][0] == 'k':
-                                userAnswer *= 1e3
-                            elif data[-1][0] == 'm':
-                                userAnswer *= 1e-3
-                            elif data[-1][0] == 'u':
-                                userAnswer *= 1e-6
-                            elif data[-1][0] == 'n':
-                                userAnswer *= 1e-9
-                            elif data[-1][0] == 'p':
-                                userAnswer *= 1e-12
-                            elif data[-1][0] == 'f':
-                                userAnswer *= 1e-15
-                            elif data[-1][0] == 'a':
-                                userAnswer *= 1e-18
-                        
-                        if VariableStuff.compareVar(userAnswer , ANS[data[0]][0], tol):
-                            judged.add(data[0])
-                            continue
-                        else:
-                            perfect = False
-                            reportWrongAnswer("{} : Wrong Answer (Expected {} but got {})".format(data[0], userAnswer , ANS[data[0]][0]))
-                            judged.add(data[0])
-                            continue
-                            
-                    else:
-                        reportFormatError("{} : Expect Equation but got Number".format(data[0], data[2]))
-                        perfect = False
-                        judged.add(data[0])
+                if data[0] == 'E':
+                    if EquationStuff.compareEqual(data[2], ANS[data[1]][2]):
+                        judged.add(data[1])
                         continue
-                elif data[1] == ':':
-                    if type(ANS[data[0]]) == type("hello"):
-
-                        result = EquationStuff.convertAndCheck(" ".join(data[2:]))
-                        if type(result) == type(""):
-                            reportFormatError("{} Equation Error : {}".format(data[0], result))
-                            perfect = False
-                            judged.add(data[0])
-                            continue
-                        else:
-                            if EquationStuff.compareEqual(" ".join(data[2:]),ANS[data[0]]):
-                                judged.add(data[0])
-                                continue
-                            else:
-                                reportWrongAnswer("{} : Wrong Answer (Here is example correct equation : {})".format(data[0], ANS[data[0]]))
-                                perfect = False
-                                judged.add(data[0])
-                                continue
                     else:
-                        reportFormatError("{} : Expect Number but got Equation".format(data[0], data[2]))
                         perfect = False
-                        judged.add(data[0])
+                        reportWrongAnswer("{} : Wrong Answer (Here is an Example {})".format(data[1], ANS[data[1]][2]))
+                        judged.add(data[1])
+                        continue
+                else:
+                    if data[3] != ANS[data[1]][3]:
+                        perfect = False
+                        reportWrongAnswer("{} : Wrong Answer (Expected {} but got {})".format(data[1], str(data[2]) + data[3] , str(ANS[data[1]][2]) + ANS[data[1]][3]))
+                        judged.add(data[1])
+                        continue
+                    elif VariableStuff.compareVar(data[2], ANS[data[1]][2], tol):
+                        judged.add(data[1])
+                        continue
+                    else:
+                        perfect = False
+                        reportWrongAnswer("{} : Wrong Answer (Expected {} but got {})".format(data[1], str(data[2]) + data[3] , str(ANS[data[1]][2]) + ANS[data[1]][3]))
+                        judged.add(data[1])
                         continue
         
         miss = "missing : "
