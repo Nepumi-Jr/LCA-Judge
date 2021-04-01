@@ -141,7 +141,7 @@ def compare():
         tc = int(testCase) - 1 
 
         if type(data) == type("Hello"):
-            return "X",0,1,f"{ANS[tc][0]} not found or Wrong format... :("
+            continue
 
         if data[1] == ANS[tc][1]:
 

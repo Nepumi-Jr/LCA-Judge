@@ -82,6 +82,9 @@ def grading(student_out:str, ref_ans:str, fullscore, report, attrib, neg_handlin
             #V1 = 2 A to ['V1','=','2','A']
             data = BigAnswerConvert.bigConvert(chunk.strip())
 
+            if type(data) == type("error"):
+                continue
+
             if data[1] in ANS and data[1] not in judged:
 
                 if data[0] != ANS[data[1]][0]:

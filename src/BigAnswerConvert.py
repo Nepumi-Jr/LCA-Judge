@@ -2,7 +2,18 @@ import VariableStuff
 import EquationStuff
 
 def bigConvert(someContent : str):
-    if ":" not in someContent:
+    
+    if ":" in someContent:
+        
+        nameVar = someContent.strip().replace(" ",'').split(":")[0]
+        data = someContent.strip().replace(" ",'').split(":")[-1]
+        
+        res = EquationStuff.convertAndCheck(data)
+        if type(res) == type("hello"):
+            return "Warning {} : {}".format(nameVar,res)
+
+        return ("E",nameVar,data)
+    elif "=" in someContent:
         nameVar = someContent.strip().replace(" ",'').split("=")[0]
         data = someContent.strip().replace(" ",'').split("=")[-1]
 
@@ -42,15 +53,7 @@ def bigConvert(someContent : str):
             if type(solAnswer) == type("hello"):
                 return "Warning {} : {}".format(nameVar,solAnswer)
             return ("V",nameVar,solAnswer,data[-1])
-    else:
-        nameVar = someContent.strip().replace(" ",'').split(":")[0]
-        data = someContent.strip().replace(" ",'').split(":")[-1]
-        
-        res = EquationStuff.convertAndCheck(data)
-        if type(res) == type("hello"):
-            return "Warning {} : {}".format(nameVar,res)
-
-        return ("E",nameVar,data)
+    return ""
 
 
 
@@ -73,3 +76,4 @@ if __name__ == "__main__":
 
 
     printWow(bigConvert("KCL:x+y=3 - 3"))
+    
