@@ -146,14 +146,14 @@ def compare():
         if data[1] == ANS[tc][1]:
 
             if ANS[tc][0] != data[0]:
-                return "X",0,1,f"{ANS[tc][0]} : Expected {ANS[tc][0] == 'E' and 'Equation' or 'Number'} got {data[0] == 'E' and 'Equation' or 'Number'}"
+                return "X",0,1,f"{ANS[tc][1]} : Expected {ANS[tc][0] == 'E' and 'Equation' or 'Number'} got {data[0] == 'E' and 'Equation' or 'Number'}"
 
             if data[0] == 'V':
                 return variableCompare(data)
             elif data[0] == "E":
                 return equationCompare(data)
 
-    return "X",0,1,f"{ANS[tc][0]} not found or Wrong format... :("
+    return "X",0,1,f"{ANS[tc][1]} not found or Wrong format... :("
 
     
 
