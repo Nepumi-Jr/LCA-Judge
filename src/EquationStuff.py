@@ -391,7 +391,6 @@ def convertAndCheck(equ:str):
         if (mode == "N" or mode == "V") and hold != '':
             thisEqu.append(hold)
         
-        print(">>>",thisEqu)
 
         realThisEqu = []
         realThisEqu.append(thisEqu[0])
@@ -449,8 +448,6 @@ def compareEqual(equ1:str, equ2:str):
         return False
     
     for var in solution1.vars:
-        print(solution2.vars)
-        print(var[0])
         res = solution2.findVarInd(solution2.vars,var[0])
         if res != -1:
             if not G_Done:
