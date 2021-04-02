@@ -338,7 +338,6 @@ def convertAndCheck(equ:str):
         hold = ""
         mode = "?" #N V or ?
         tempP = 0
-        firstPar = False;
         
 
         for sym in equa:
@@ -365,27 +364,15 @@ def convertAndCheck(equ:str):
                         hold = ""
                         mode = "?"
                 elif sym == "(":
-                    if tempP == 0:
-                        if firstPar:
-                            tempP += 1
-                            hold += sym
-                            firstPar = False
-                        else:
-                            thisEqu.append(hold)
-                            thisEqu.append(sym)
-                            hold = ""
-                            mode = "?"
-                    else:
-                        tempP += 1
-                        hold += sym
+                    tempP += 1
+                    hold += sym
                 elif sym == ")":
+                    tempP -= 1
                     if tempP == 0:
-                        thisEqu.append(hold)
-                        thisEqu.append(sym)
+                        thisEqu.append(hold+sym)
                         hold = ""
                         mode = "?"
                     else:
-                        tempP -= 1
                         hold += sym
                     
                 else:
@@ -404,6 +391,8 @@ def convertAndCheck(equ:str):
         if (mode == "N" or mode == "V") and hold != '':
             thisEqu.append(hold)
         
+        print(">>>",thisEqu)
+
         realThisEqu = []
         realThisEqu.append(thisEqu[0])
 
@@ -413,6 +402,8 @@ def convertAndCheck(equ:str):
             if realThisEqu[-1] not in "+-*/()" and stuff not in "+-*/()":
                 realThisEqu.append("*")
             elif realThisEqu[-1].endswith(")") and stuff.startswith("("):
+                realThisEqu.append("*")
+            elif realThisEqu[-1].endswith(")") and stuff not in "+-*/()":
                 realThisEqu.append("*")
             realThisEqu.append(stuff)
 
@@ -458,6 +449,8 @@ def compareEqual(equ1:str, equ2:str):
         return False
     
     for var in solution1.vars:
+        print(solution2.vars)
+        print(var[0])
         res = solution2.findVarInd(solution2.vars,var[0])
         if res != -1:
             if not G_Done:
@@ -497,29 +490,32 @@ def compareEqual(equ1:str, equ2:str):
 
 if __name__ == "__main__" :
     
-    print(compareEqual("0 = 2 x + 3 y ","2 x + 3 y = 0"))
-    print(compareEqual("-  2 x = + 3 y ","2 x + 3 y = 0"))
-    print(compareEqual("- 2 x - 3 y = 0","2 x + 3 y = 0"))
-    print(compareEqual("- 2 x - 3 y + 1 = 1","2 x + 3 y = 0"))
-    print(compareEqual("2 x + 3 y = 0","2 x + 3 y = 0"))
+    # print(compareEqual("0 = 2 x + 3 y ","2 x + 3 y = 0"))
+    # print(compareEqual("-  2 x = + 3 y ","2 x + 3 y = 0"))
+    # print(compareEqual("- 2 x - 3 y = 0","2 x + 3 y = 0"))
+    # print(compareEqual("- 2 x - 3 y + 1 = 1","2 x + 3 y = 0"))
+    # print(compareEqual("2 x + 3 y = 0","2 x + 3 y = 0"))
 
-    print("WA")
-    print(compareEqual("2 x + 3 y = 0 ","- 2 x + 3 y = 0"))
+    # print("WA")
+    # print(compareEqual("2 x + 3 y = 0 ","- 2 x + 3 y = 0"))
 
-    print("\nTest")
-    print(compareEqual("Vy + Vx = - 2 * Vx + 5","Vx + Vy + 2 * Vx = 5"))
+    # print("\nTest")
+    # print(compareEqual("Vy + Vx = - 2 * Vx + 5","Vx + Vy + 2 * Vx = 5"))
 
-    print(compareEqual("Vx * Vx + Vy = 2", "Vx * Vx = 2 - Vy"))
-    print(compareEqual("3 Vx = 3","Vx = 1"))
-    print(compareEqual("3Vx = 3","1 = Vx"))
-    print(compareEqual("3Vx = 3","-1 + Vx = 0"))
-    print(compareEqual("3y * i + ( 3x - 6y ) * j = 0","3y * (i + j) + ( x - y ) * 3j = 0"))
+    # print(compareEqual("Vx * Vx + Vy = 2", "Vx * Vx = 2 - Vy"))
+    # print(compareEqual("3 Vx = 3","Vx = 1"))
+    # print(compareEqual("3Vx = 3","1 = Vx"))
+    # print(compareEqual("3Vx = 3","-1 + Vx = 0"))
+    # print(compareEqual("3y * i + ( 3x - 6y ) * j = 0","3y * (i + j) + ( x - y ) * 3j = 0"))
 
-    print(compareEqual("xy = 0","x * y = 0"))
-    print(compareEqual("x y = 0","x * y = 0"))
-    print(compareEqual("y * x = 0","x * y = 0"))
+    # print(compareEqual("xy = 0","x * y = 0"))
+    # print(compareEqual("x y = 0","x * y = 0"))
+    # print(compareEqual("y * x = 0","x * y = 0"))
 
-    print(compareEqual("V(t) = t * t - 1 t - 12","V(t) = ( t - 4 ) * ( t + 3 )"))
+    # print(compareEqual("V(t) = t * t - 1 t - 12","V(t) = ( t - 4 ) * ( t + 3 )"))
 
 
-    print(compareEqual("V(T) = 1/12/35exp(x+2)", "V(T) = 1/(12*35)exp(x+1+1)"))
+    # print(compareEqual("V(T) = 1/12/35exp(x+2)", "V(T) = 1/(12*35)exp(x+1+1)"))
+    print(convertAndCheck("Vc = 12 - 8 exp(-12.5 t) V"))
+    print(convertAndCheck("Vx = func(12 + x)(y+3)"))
+    print(compareEqual("Vc = 12 - 8 exp(-12.5 t) V","Vc = 12 - 8 exp(-12.5 t)"))
