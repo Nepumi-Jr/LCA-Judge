@@ -413,6 +413,9 @@ def convertAndCheck(equ:str):
     return equations
 
 def compareEqual(equ1:str, equ2:str):
+
+    TOL = 0.001
+
     resultE1 = convertAndCheck(equ1)
     if type(resultE1) == type(str()):
         return "Equ 1 error : {}".format(resultE1)
@@ -433,7 +436,7 @@ def compareEqual(equ1:str, equ2:str):
     solution2.doVerify()
 
     G_Fac = 1.0
-    G_Done = False
+    G_Done = 0
     
     
     if solution1.num == 0 or solution2.num == 0:
@@ -441,7 +444,7 @@ def compareEqual(equ1:str, equ2:str):
             return False
     else:
         G_Fac = solution1.num / solution2.num
-        G_Done = True
+        G_Done = 1
     
     
     if len(solution1.vars) != len(solution2.vars):
@@ -450,11 +453,12 @@ def compareEqual(equ1:str, equ2:str):
     for var in solution1.vars:
         res = solution2.findVarInd(solution2.vars,var[0])
         if res != -1:
-            if not G_Done:
+            if G_Done == 0:
                 G_Fac = var[1] / solution2.vars[res][1]
-                G_Done = True
+                G_Done = 1
             else:
-                if abs(G_Fac - var[1] / solution2.vars[res][1]) / G_Fac >= 0.01:
+                G_Done += 1
+                if abs(G_Fac - var[1] / solution2.vars[res][1]) / G_Fac >= TOL:
                     return False    
             
             #Compare function
@@ -472,7 +476,6 @@ def compareEqual(equ1:str, equ2:str):
                     
                     newE1 = findV1[findV1.find("(") + 1 : findLast(findV1,")")]+"=0"
                     newE2 = findV2[findV2.find("(") + 1 : findLast(findV2,")")]+"=0"
-
                     if compareEqual(newE1,newE2) == False:
                         return False
 
@@ -481,6 +484,8 @@ def compareEqual(equ1:str, equ2:str):
         else:
             return False
     
+    if G_Done == 1 :
+        return abs(G_Fac - 1.0) < TOL
     
     return True
 
@@ -515,4 +520,6 @@ if __name__ == "__main__" :
     # print(compareEqual("V(T) = 1/12/35exp(x+2)", "V(T) = 1/(12*35)exp(x+1+1)"))
     print(convertAndCheck("Vc = 12 - 8 exp(-12.5 t) V"))
     print(convertAndCheck("Vx = func(12 + x)(y+3)"))
-    print(compareEqual("Vc = 12 - 8 exp(-12.5 t) V","Vc = 12 - 8 exp(-12.5 t)"))
+    print(compareEqual("Vc = 12 - 8 exp(-12.5 t)","Vc = 12 - 8 exp(-12.5 t)"))
+    print(compareEqual("Vc = 7 exp( -2000 t ) + 5","Vc=7exp(-1000000t)+5"))
+    print(compareEqual("-2000t=0","-1000000t=0"))
