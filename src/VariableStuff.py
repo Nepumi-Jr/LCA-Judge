@@ -65,8 +65,8 @@ class ComplexNumber:
             except:
                 return "Can't convert {} to degree".format(onlyNum)
             
-            im = math.sin(onlyNum)
-            re = math.cos(onlyNum)
+            im = math.sin(float(onlyNum))
+            re = math.cos(float(onlyNum))
 
             if spl2[1].strip():
                 onlyNum = spl2[1].strip()
