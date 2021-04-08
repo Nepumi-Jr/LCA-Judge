@@ -67,6 +67,20 @@ cmpArg = judgeArgs[6] or ""
 outMain = judgeArgs[7]
 outArg = judgeArgs[8]
 
+def getNumTol():
+
+    DEF_TOL = 0.001
+
+    if path.exists(path.join(PROBLEM_DIR,"Numtol.txt")):
+        try:
+            with open(path.join(PROBLEM_DIR,"Numtol.txt"),"r") as f:
+                float(f)
+                return float(f)
+        except:
+            return DEF_TOL
+    
+    return DEF_TOL
+
 
 def writeLog(text:str):
     with open(path.join(PROBLEM_DIR,f"{int(time.time())}T{testCase}LOG.txt"),"w") as f:
@@ -113,13 +127,15 @@ def readSolution():
 
 def variableCompare(data):
     tc = int(testCase) - 1 
-    if VariableStuff.compareVar(data[2] , ANS[tc][2], 0.001) and data[3] == ANS[tc][3]:
+    tol = getNumTol()
+    if VariableStuff.compareVar(data[2] , ANS[tc][2], tol) and data[3] == ANS[tc][3]:
         return "P",1,1,"Wow za!"
     else:
         return "-",0,1,f"{data[1]} : Wrong Answer"
 
 def equationCompare(data):
-    if EquationStuff.compareEqual(data[2],ANS[int(testCase) - 1][2]):
+    tol = getNumTol()
+    if EquationStuff.compareEqual(data[2],ANS[int(testCase) - 1][2],tol):
         return "P",1,1,"Complete"
     else:
         return "-",0,1,f"{data[1]} : Wrong answer"

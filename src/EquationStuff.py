@@ -420,9 +420,7 @@ def convertAndCheck(equ:str):
 
     return equations
 
-def compareEqual(equ1:str, equ2:str):
-
-    TOL = 0.001
+def compareEqual(equ1:str, equ2:str, tol:float):
 
     resultE1 = convertAndCheck(equ1)
     if type(resultE1) == type(str()):
@@ -469,7 +467,7 @@ def compareEqual(equ1:str, equ2:str):
                 G_Done = 1
             else:
                 G_Done += 1
-                if abs(G_Fac - var[1] / solution2.vars[res][1]) >= TOL:
+                if abs(G_Fac - var[1] / solution2.vars[res][1]) >= tol:
                     return False    
             
             #Compare function
@@ -496,7 +494,7 @@ def compareEqual(equ1:str, equ2:str):
             return False
     
     if G_Done == 1 :
-        return abs(G_Fac - 1.0) < TOL
+        return abs(G_Fac - 1.0) < tol
     
     return True
 
