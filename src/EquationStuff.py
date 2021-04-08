@@ -420,7 +420,7 @@ def convertAndCheck(equ:str):
 
     return equations
 
-def compareEqual(equ1:str, equ2:str, tol:float):
+def compareEqual(equ1:str, equ2:str, tol:float = 0.001):
 
     resultE1 = convertAndCheck(equ1)
     if type(resultE1) == type(str()):

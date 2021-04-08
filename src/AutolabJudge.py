@@ -94,7 +94,7 @@ def grading(student_out:str, ref_ans:str, fullscore, report, attrib, neg_handlin
                     continue
 
                 if data[0] == 'E':
-                    if EquationStuff.compareEqual(data[2], ANS[data[1]][2]):
+                    if EquationStuff.compareEqual(data[2], ANS[data[1]][2], tol):
                         judged.add(data[1])
                         continue
                     else:

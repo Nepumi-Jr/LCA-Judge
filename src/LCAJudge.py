@@ -71,11 +71,11 @@ def getNumTol():
 
     DEF_TOL = 0.001
 
-    if path.exists(path.join(PROBLEM_DIR,"Numtol.txt")):
+    if path.exists(path.join(PROBLEM_DIR,"numtol.txt")):
         try:
-            with open(path.join(PROBLEM_DIR,"Numtol.txt"),"r") as f:
-                float(f)
-                return float(f)
+            with open(path.join(PROBLEM_DIR,"numtol.txt"),"r") as f:
+                float(f.read().strip())
+                return abs(float(f.read().strip()))
         except:
             return DEF_TOL
     
