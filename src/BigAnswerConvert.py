@@ -3,6 +3,13 @@ import EquationStuff
 
 def bigConvert(someContent : str):
     
+    someContent = someContent.replace("-","-")
+    someContent = someContent.replace("–","-")
+    someContent = someContent.replace("—","-")
+    #Dash-Hyphen(-), En-dash (–), Em-dash(—)
+    #What how?
+
+
     if ":" in someContent:
         
         nameVar = someContent.strip().replace(" ",'').split(":")[0]
