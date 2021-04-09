@@ -337,7 +337,24 @@ def convertAndCheck(equ:str):
     if content[0].strip() == '' or content[1].strip() == '':
         return "None equation..."
 
+
+
     for equa in content:
+        
+        par = 0
+        for e in equa:
+            if e == '(':
+                par += 1
+            elif e == ')':
+                par -= 1
+
+            if par < 0:
+                return "Wrong parenthesis format"
+        
+        if par != 0:
+            return "Wrong parenthesis format"
+
+
         thisEqu = []
         hold = ""
         mode = "?" #N V or ?
