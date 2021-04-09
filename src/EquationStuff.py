@@ -334,6 +334,9 @@ def convertAndCheck(equ:str):
     if len(content) == 1:
         return "No '=' in equation."
 
+    if content[0].strip() == '' or content[1].strip() == '':
+        return "None equation..."
+
     for equa in content:
         thisEqu = []
         hold = ""
