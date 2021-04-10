@@ -128,7 +128,8 @@ def readSolution():
 def variableCompare(data):
     tc = int(testCase) - 1 
     tol = getNumTol()
-    if VariableStuff.compareVar(data[2] , ANS[tc][2], tol) and data[3] == ANS[tc][3]:
+
+    if VariableStuff.compareVar(data[2] , ANS[tc][2], tol) and data[3].lower() == ANS[tc][3].lower():
         return "P",1,1,"Wow za!"
     else:
         return "-",0,1,f"{data[1]} : Wrong Answer"
