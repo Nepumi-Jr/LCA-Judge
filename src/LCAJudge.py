@@ -67,6 +67,12 @@ cmpArg = judgeArgs[6] or ""
 outMain = judgeArgs[7]
 outArg = judgeArgs[8]
 
+def DEBUG(x):
+    if testCase != "2":
+        print(f"D;0;1;0;0;{x}")
+    else:
+        print(f"E;0;1;0;0;ENDED")
+
 def getNumTol():
 
     DEF_TOL = 0.001
@@ -74,6 +80,7 @@ def getNumTol():
     if path.exists(path.join(PROBLEM_DIR,"numtol.txt")):
         try:
             with open(path.join(PROBLEM_DIR,"numtol.txt"),"r") as f:
+                DEBUG(f.read().strip())
                 float(f.read().strip())
                 return abs(float(f.read().strip()))
         except:
