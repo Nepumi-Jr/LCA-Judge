@@ -72,6 +72,7 @@ def DEBUG(x):
         print(f"D;0;1;0;0;{x}")
     else:
         print(f"E;0;1;0;0;ENDED")
+    exit(0) 
 
 def getNumTol():
 
