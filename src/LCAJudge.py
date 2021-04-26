@@ -81,7 +81,6 @@ def getNumTol():
     if path.exists(path.join(PROBLEM_DIR,"numtol.txt")):
         try:
             with open(path.join(PROBLEM_DIR,"numtol.txt"),"r") as f:
-                DEBUG(f.read().strip())
                 float(f.read().strip())
                 return abs(float(f.read().strip()))
         except:
