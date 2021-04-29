@@ -68,7 +68,7 @@ class ComplexNumber:
             im = math.sin(float(onlyNum))
             re = math.cos(float(onlyNum))
 
-            if spl2[1].strip():
+            if len(spl2) >= 2 and spl2[1].strip():
                 onlyNum = spl2[1].strip()
                     
                 try:
