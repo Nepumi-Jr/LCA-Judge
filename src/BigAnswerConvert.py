@@ -23,7 +23,7 @@ def bigConvert(someContent : str):
     elif "=" in someContent:
         nameVar = someContent.strip().replace(" ",'').split("=")[0]
         data = someContent.strip().replace(" ",'').split("=")[-1]
-        if len(data) != 2 :
+        if len(data) < 2:
             return ""
         if data[-2] in "EPTGMkmunpfa":
             solAnswer = VariableStuff.ComplexNumber.fromStr(data[:-2])
