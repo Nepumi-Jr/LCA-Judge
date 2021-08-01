@@ -1,34 +1,35 @@
 import VariableStuff
 import EquationStuff
 
-def bigConvert(someContent : str):
-    
-    someContent = someContent.replace("-","-")
-    someContent = someContent.replace("–","-")
-    someContent = someContent.replace("—","-")
-    #Dash-Hyphen(-), En-dash (–), Em-dash(—)
-    #What how?
 
+def bigConvert(someContent: str):
+
+    someContent = someContent.replace("-", "-")
+    someContent = someContent.replace("–", "-")
+    someContent = someContent.replace("—", "-")
+    # Dash-Hyphen(-), En-dash (–), Em-dash(—)
+    # What how?
 
     if ":" in someContent:
-        
-        nameVar = someContent.strip().replace(" ",'').split(":")[0]
-        data = someContent.strip().replace(" ",'').split(":")[-1]
-        
+
+        nameVar = someContent.strip().replace(" ", '').split(":")[0]
+        data = someContent.strip().replace(" ", '').split(":")[-1]
+
         res = EquationStuff.convertAndCheck(data)
         if type(res) == type("hello"):
-            return "Warning {} : {}".format(nameVar,res)
+            return "Warning {} : {}".format(nameVar, res)
 
-        return ("E",nameVar,data)
+        return ("E", nameVar, data)
     elif "=" in someContent:
-        nameVar = someContent.strip().replace(" ",'').split("=")[0]
-        data = someContent.strip().replace(" ",'').split("=")[-1]
+        nameVar = "=".join(
+            someContent.strip().replace(" ", '').split("=")[:-1])
+        data = someContent.strip().replace(" ", '').split("=")[-1]
         if len(data) < 2:
             return ""
         if data[-2] in "EPTGMkmunpfa":
             solAnswer = VariableStuff.ComplexNumber.fromStr(data[:-2])
             if type(solAnswer) == type("hello"):
-                return "Warning {} : {}".format(nameVar,solAnswer)
+                return "Warning {} : {}".format(nameVar, solAnswer)
 
             if data[-2] == 'E':
                 solAnswer *= 1e18
@@ -54,34 +55,31 @@ def bigConvert(someContent : str):
                 solAnswer *= 1e-15
             elif data[-2] == 'a':
                 solAnswer *= 1e-18
-            
-            return ("V",nameVar,solAnswer,data[-1])
+
+            return ("V", nameVar, solAnswer, data[-1])
         else:
             solAnswer = VariableStuff.ComplexNumber.fromStr(data[:-1])
             if type(solAnswer) == type("hello"):
-                return "Warning {} : {}".format(nameVar,solAnswer)
-            return ("V",nameVar,solAnswer,data[-1])
+                return "Warning {} : {}".format(nameVar, solAnswer)
+            return ("V", nameVar, solAnswer, data[-1])
     return ""
-
-
 
 
 if __name__ == "__main__":
 
     def printWow(content):
-        print("Type",content[0],content[1],"is",content[2],end = " ")
+        print("Type", content[0], content[1], "is", content[2], end=" ")
 
-        if len(content) > 3 :
+        if len(content) > 3:
             print(content[3])
         else:
             print()
-
 
     printWow(bigConvert("I1 = 1.2 A"))
     printWow(bigConvert("I1=1.2A"))
     printWow(bigConvert("I1=       1.2mA"))
     printWow(bigConvert("I1 7 = 1.2A"))
 
-
     printWow(bigConvert("KCL:x+y=3 - 3"))
-    
+
+    printWow(bigConvert("when @t=1 = 809c8098 = 1.2 A"))
